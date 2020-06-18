@@ -1,6 +1,6 @@
 ;;; orgbital.el --- description -*- lexical-binding: t; -*-
 ;;
-;; Copyright (C) 2020 Tan Yee Jian
+;; Copyright (C) 2020 Orgbital
 ;;
 ;; Author: Jing Yen Loh, Tan Yee Jian <http://github.com/orgbital>
 ;; Maintainer: Jing Yen Loh <lohjingyen@gmail.com>, Tan Yee Jian <tanyeejian@gmail.com>
@@ -26,6 +26,9 @@
                :service "/tmp/unix.sock"
                :family 'local))
 
+;; (defun use-current-buffer (program)
+;;   (with-current-buffer (current-buffer) (program)))
+
 (defun send-message (begin-pos end-pos pre-change-length)
   "Foo. C sucks."
   ;; First we need to connect to the node daemon
@@ -39,7 +42,21 @@
     )
   )
 
-(add-hook 'after-change-functions 'send-message)
+;; TODO: send document to server and get a OK response
+(defun send-buffer-to-node ()
+  "Sends the text content of the current buffer to the node process."
+  (interactive)
+
+  (with-current-buffer (current-buffer)
+  (let ((keith (concat "ahkuanisgod" (buffer-substring-no-properties (point-min) (point-max)) "godisahkuan")))
+    (process-send-string orgbital-socket keith)
+    ))
+
+  )
+
+;; TODO: insert/delete
+
+;; (add-hook 'after-change-functions 'send-message)
 
 (provide 'orgbital)
 ;;; orgbital.el ends here
