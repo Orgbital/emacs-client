@@ -26,8 +26,6 @@
                :service "/tmp/unix.sock"
                :family 'local))
 
-;; (defun use-current-buffer (program)
-;;   (with-current-buffer (current-buffer) (program)))
 
 (defun send-message (begin-pos end-pos pre-change-length)
   "Foo. C sucks."
@@ -38,9 +36,11 @@
   (with-current-buffer
       (current-buffer)
     (process-send-string orgbital-socket
-                         (format "hi %d %d %d %s\n" begin-pos end-pos pre-change-length (buffer-substring-no-properties begin-pos end-pos)))
-    )
-  )
+                         (format "hi %d %d %d %s\n"
+                                 begin-pos
+                                 end-pos
+                                 pre-change-length
+                                 (buffer-substring-no-properties begin-pos end-pos)))))
 
 ;; TODO: send document to server and get a OK response
 (defun send-buffer-to-node ()
