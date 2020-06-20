@@ -26,6 +26,15 @@
                :service "/tmp/unix.sock"
                :family 'local))
 
+;; HACK Probably not idiomatic code and HaoWei will slaughter, but it works. We
+;; should probably be using `get-process' more.
+(defun restart-orgbital-socket ()
+  "Restarts the orbital network process, if it is closed."
+  (if (eq (process-status orgbital-socket) 'closed)
+      (setq orgbital-socket(make-network-process
+                            :name "orgbital"
+                            :service "/tmp/unix.sock"
+                            :family 'local))))
 
 (defun send-message (begin-pos end-pos pre-change-length)
   "Foo. C sucks."
@@ -48,11 +57,12 @@
   (interactive)
 
   (with-current-buffer (current-buffer)
-  (let ((keith (concat "ahkuanisgod" (buffer-substring-no-properties (point-min) (point-max)) "godisahkuan")))
-    (process-send-string orgbital-socket keith)
-    ))
-
-  )
+  (let ((keith (concat "ahkuanisgod"
+                       (buffer-substring-no-properties (point-min) (point-max))
+                       "godisahkuan")))
+    (progn
+      (restart-orgbital-socket) ;; HACK stop using this when we figure out proper way LOL
+      (process-send-string orgbital-socket keith)))))
 
 ;; TODO: insert/delete
 
