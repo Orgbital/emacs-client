@@ -57,12 +57,12 @@
   (interactive)
 
   (with-current-buffer (current-buffer)
-  (let ((keith (concat "ahkuanisgod"
-                       (buffer-substring-no-properties (point-min) (point-max))
-                       "godisahkuan")))
-    (progn
-      (restart-orgbital-socket) ;; HACK stop using this when we figure out proper way LOL
-      (process-send-string orgbital-socket keith)))))
+    (let ((content (concat "ahkuanisgod"
+                           (buffer-substring-no-properties (point-min) (point-max))
+                           "godisahkuan")))
+      (progn
+        (restart-orgbital-socket) ; HACK stop using this when we figure out proper way LOL
+        (process-send-string orgbital-socket content)))))
 
 ;; TODO: insert/delete
 (defun send-deltas-to-socket (begin-pos end-pos pre-change-length)
