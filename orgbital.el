@@ -36,20 +36,6 @@
                             :service "/tmp/unix.sock"
                             :family 'local))))
 
-(defun send-message (begin-pos end-pos pre-change-length)
-  "Foo. C sucks."
-  ;; First we need to connect to the node daemon
-  ;; Next we need to figure out the character in the insert action
-  ;; Transfrom character into {p:[path,offset], si:s}
-  ;; Send this json over unix socket
-  (with-current-buffer
-      (current-buffer)
-    (process-send-string orgbital-socket
-                         (format "hi %d %d %d %s\n"
-                                 begin-pos
-                                 end-pos
-                                 pre-change-length
-                                 (buffer-substring-no-properties begin-pos end-pos)))))
 
 ;; TODO: send document to server and get a OK response
 (defun send-buffer-to-node ()
