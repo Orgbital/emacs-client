@@ -21,21 +21,37 @@
 
 (require 'json)
 
+(defun orgbital-filter (_ msg)
+  "Foo. PROC MSG."
+  (progn
+    (message "filter")
+    (message msg)))
+
+(defun orgbital-sentinel (_ msg)
+  "Listener for orgbital-socket, called whenever a change is received.
+MSG is probably the message."
+  (progn
+    (message "called")
+    (message msg)))
+
 (defvar orgbital-socket (make-network-process
-               :name "orgbital"
-               :service "/tmp/unix.sock"
-               :family 'local))
+                         :name "orgbital"
+                         :service "/tmp/unix.sock"
+                         :family 'local
+                         :sentinel 'orgbital-sentinel
+                         :filter 'orgbital-filter))
 
 ;; HACK Probably not idiomatic code and HaoWei will slaughter, but it works. We
 ;; should probably be using `get-process' more.
 (defun restart-orgbital-socket ()
   "Restarts the orbital network process, if it is closed."
   (if (eq (process-status orgbital-socket) 'closed)
-      (setq orgbital-socket(make-network-process
-                            :name "orgbital"
-                            :service "/tmp/unix.sock"
-                            :family 'local))))
-
+      (setq orgbital-socket (make-network-process
+                             :name "orgbital"
+                             :service "/tmp/unix.sock"
+                             :family 'local
+                             :sentinel 'orgbital-sentinel
+                             :filter 'orgbital-filter))))
 
 ;; TODO: send document to server and get a OK response
 (defun send-buffer-to-node ()
