@@ -65,8 +65,38 @@
       (process-send-string orgbital-socket keith)))))
 
 ;; TODO: insert/delete
+(defun send-deltas-to-socket (begin-pos end-pos pre-change-length)
+  "Sends the text change in the current buffer to the node process.
+BEGIN-POS signfies the starting position of the change and END-POS the ending.
+PRE-CHANGE-LENGTH is used to determine if it was an insert or delete operation."
+  ;; HACK: deal with the WTF message
+  ;; (message "begin-pos %s end-pos %s" begin-pos end-pos)
+  (cond ((string= "(send-deltas-to-socket)"
+                  (buffer-substring-no-properties begin-pos end-pos))
+         nil)
+        (t (with-current-buffer (current-buffer)
+             (let* ((path (file-name-nondirectory buffer-file-name)) ; e.g. "orgbital.el"
+                    (ops (format "{\"p\":%d, %s}"
+                                 begin-pos
+                                 (if (> pre-change-length 0) ; It's a deletion
+                                     (concat "\"d\":\"" ; delete op
+                                             pre-change-length
+                                             "\"")
+                                   (concat "\"i\":\"" ; insert op
+                                           "a"
+                                           ;; (buffer-substring-no-properties begin-pos end-pos)
+                                           "\""))))
+                    (msg (concat "fsp"
+                                 (format "{\"p\":[\"%s\"], \"t\":\"text0\", \"o\":[%s]}"
+                                         path
+                                         ops)
+                                 "fsp")))
+               (progn
+                 (restart-orgbital-socket) ; HACK stop using this when we figure out proper way LOL
+                 ;; (message "%s" msg)
+                 (process-send-string orgbital-socket msg)))))))
 
-;; (add-hook 'after-change-functions 'send-message)
+(add-hook 'after-change-functions 'send-deltas-to-socket)
 
 (provide 'orgbital)
 ;;; orgbital.el ends here
